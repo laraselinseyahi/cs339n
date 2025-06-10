@@ -116,7 +116,7 @@ optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 for epoch in range(5):  # train for 5 epochs
     model.train()
     total_loss = 0.0
-    print(f"\n🚀 starting epoch {epoch+1}...")
+    print(f"\n starting epoch {epoch+1}...")
 
     for i, (imgs, tgts) in enumerate(train_dl):
         imgs, tgts = imgs.to(device), tgts.to(device)  # move to gpu if available
@@ -131,13 +131,13 @@ for epoch in range(5):  # train for 5 epochs
         total_loss += loss.item()  # accumulate loss
 
         if (i + 1) % 10 == 0:  # print progress every 10 steps
-            print(f"  ✅ [{i + 1}/{len(train_dl)}] loss: {loss.item():.4f}")
+            print(f" [{i + 1}/{len(train_dl)}] loss: {loss.item():.4f}")
 
     print(f"📈 epoch {epoch+1} complete. total loss: {total_loss:.4f}")  # end of epoch summary
 
 # save the model to file
 torch.save(model.state_dict(), "pose_model.pt")
-print("✅ model saved to pose_model.pt")
+print(" model saved to pose_model.pt")
 
 # visualization helper to inspect model predictions on a sample image
 def visualize_prediction(model, dataset, index=0, output_path="output.png"):
@@ -161,4 +161,4 @@ def visualize_prediction(model, dataset, index=0, output_path="output.png"):
 
     plt.tight_layout()
     plt.savefig(output_path)
-    print(f"📸 saved visualization to {output_path}")
+    print(f" saved visualization to {output_path}")
