@@ -240,9 +240,7 @@ plt.tight_layout()
 plt.savefig(os.path.join(SAVE_DIR, "loss_l2_curve.png"))
 plt.close()
 
-# ----------------------------
-# FINAL TEST EVAL
-# ----------------------------
+# final eval
 model.load_state_dict(torch.load(os.path.join(SAVE_DIR, "pose_transformer_exp_a_best.pt")))
 model.eval()
 
