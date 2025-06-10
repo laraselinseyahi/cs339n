@@ -126,7 +126,7 @@ for epoch in range(5):
         total_loss += loss.item()
 
         if (i + 1) % 10 == 0:
-            print(f"  ✅ [{i + 1}/{len(train_dl)}] loss: {loss.item():.4f}")
+            print(f"  [{i + 1}/{len(train_dl)}] loss: {loss.item():.4f}")
 
     avg_loss = total_loss / len(train_dl)
     loss_per_epoch.append(avg_loss)
@@ -134,7 +134,6 @@ for epoch in range(5):
 
 # save model for comparison
 torch.save(model.state_dict(), "pose_model_dilated.pt")
-print("✅ model saved to pose_model_dilated.pt")
 
 # plot and save loss curve
 plt.plot(loss_per_epoch, marker='o')
@@ -144,8 +143,6 @@ plt.title("Training Loss Curve")
 plt.grid(True)
 plt.tight_layout()
 plt.savefig("training_loss_dilated.png")
-print("📊 Saved training loss plot to training_loss_dilated.png")
 
 # save model for comparison
 torch.save(model.state_dict(), "pose_model_dilated.pt")
-print("✅ model saved to pose_model_dilated.pt")
