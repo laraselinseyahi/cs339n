@@ -14,9 +14,7 @@ from pose_dataset import PoseDataset
 from data_utils import load_annotations
 from split_utils_new import split_by_video
 
-# ----------------------------
-# UTILS
-# ----------------------------
+# utils
 def softargmax_2d(logits, orig_w=1024, orig_h=570):
     B, K, H, W = logits.shape
     probs = torch.softmax(logits.view(B, K, -1), dim=-1).view(B, K, H, W)
@@ -108,9 +106,7 @@ def visualize_predictions(model, dataset, annotation_data, save_dir, num_samples
             plt.savefig(os.path.join(save_dir, f"viz_{i:02d}.png"))
             plt.close()
 
-# ----------------------------
-# CONFIG
-# ----------------------------
+# config
 TRAIN_ANNOTATION_PATH = "/home/ubuntu/stats-320-file/calms21_task1_train.npy"
 TEST_ANNOTATION_PATH = "/home/ubuntu/stats-320-file/calms21_task1_test.npy"
 VIDEO_DIR = "/home/ubuntu/stats-320-file/task1_videos_mp4/train"
@@ -124,8 +120,9 @@ EPOCHS = 50
 PATIENCE = 7
 WINDOW_SIZE = 5
 LEARNING_RATE = 1e-4
-# ---------------------------- DATA ----------------------------
-print("🔄 Loading annotations...")
+
+# data
+print("loading data annotations")
 train_annots = load_annotations(TRAIN_ANNOTATION_PATH)
 test_annots_full = load_annotations(TEST_ANNOTATION_PATH)
 
@@ -147,8 +144,8 @@ val_pairs, _ = split_by_video(val_annots, window_size=WINDOW_SIZE)
 val_pairs = val_pairs[:200]
 
 # Print actual sample counts for debug
-print(f"✅ Training on {len(train_pairs)} frames")
-print(f"✅ Validating on {len(val_pairs)} frames")
+print(f"training on {len(train_pairs)} frames")
+print(f"validating on {len(val_pairs)} frames")
 
 train_dataset = PoseDataset(VIDEO_DIR, train_annots, WINDOW_SIZE, train_pairs, only_keypoint=0)
 val_dataset = PoseDataset(VIDEO_DIR_T, val_annots, WINDOW_SIZE, val_pairs, only_keypoint=0)
@@ -162,15 +159,12 @@ test_dataset = PoseDataset(VIDEO_DIR_T, test_annots, WINDOW_SIZE, test_pairs, on
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 
 
-# ----------------------------
-# MODEL
-# ----------------------------
+# model
 model = PoseTransformer(num_keypoints=1).to(DEVICE)
 optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-
-# ---------------------------- TRAIN LOOP ----------------------------
-print("🚀 Starting training (experiment A: 1kp)...")
+# train loop
+print("start of training")
 best_l2 = float('inf')
 patience_counter = 0
 loss_history, l2_history = [], []
@@ -201,7 +195,7 @@ with open(csv_path, 'w', newline='') as f:
         avg_l2 = compute_l2_error(model, val_dataset, val_annots)
         loss_history.append(avg_loss)
         l2_history.append(avg_l2)
-        print(f"📘 Epoch {epoch+1:2d} | KL Loss: {avg_loss:.4f} | Val L2 Error: {avg_l2:.2f} px")
+        print(f"epoch {epoch+1:2d} | KL Loss: {avg_loss:.4f} | Val L2 Error: {avg_l2:.2f} px")
 
         writer.writerow([epoch+1, avg_loss, avg_l2])
 
@@ -225,14 +219,14 @@ with open(csv_path, 'w', newline='') as f:
 
 
         if patience_counter >= PATIENCE:
-            print(f"⏹️ Early stopping at epoch {epoch+1}.")
+            print(f" early stopping at epoch {epoch+1}.")
             break
 
 
 
 # Save final model
 torch.save(model.state_dict(), os.path.join(SAVE_DIR, "pose_transformer_exp_a_last.pt"))
-print("✅ Model saved.")
+print("model saved")
 
 # Plot
 plt.figure()
@@ -273,6 +267,4 @@ with open(test_csv_path, 'w', newline='') as f:
 
 visualize_predictions(model, test_dataset, test_annots, os.path.join(SAVE_DIR, "test_eval_viz"), num_samples=10)
 
-print(f"📊 Final Test L2 Error over {count} frames: {total_dist / count:.2f} px")
-
-# visualize metrics 
+print(f" final Test L2 Error over {count} frames: {total_dist / count:.2f} px")
