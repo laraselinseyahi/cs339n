@@ -190,7 +190,7 @@ with open(csv_path, 'w', newline='') as f:
             visualize_predictions(model, val_dataset, val_annots, epoch_viz_dir)
 
         if patience_counter >= PATIENCE:
-            print(f"⏹️ Early stopping at epoch {epoch+1}.")
+            print(f" early stopping at epoch {epoch+1}.")
             break
 
 
