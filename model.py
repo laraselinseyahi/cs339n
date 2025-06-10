@@ -31,13 +31,13 @@ class PoseTransformer(nn.Module):
     def forward(self, x):
         # x: [B, T, 3, 224, 224]
         B, T, C, H, W = x.shape
-        x = x.view(B * T, C, H, W)  # ✅ flatten temporal dim
+        x = x.view(B * T, C, H, W)  # flatten temporal dim
         x = self.patch_embed(x)     # [B*T, D, 14, 14]
 
         Hf, Wf = x.shape[2], x.shape[3]
         x = x.flatten(2).transpose(1, 2)  # [B*T, 196, D]
 
-        x = x.reshape(B, T * self.num_patches, self.embed_dim)  # ✅ no view issues
+        x = x.reshape(B, T * self.num_patches, self.embed_dim)  # no view issues
 
         x = x + self.temporal_embed[:, :x.size(1), :]  # [B, T*196, D]
         x = self.encoder(x)  # transformer attention over flattened temporal patches
