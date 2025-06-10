@@ -6,7 +6,7 @@ from torchvision.transforms import Compose
 import torchvision.transforms.functional as TF
 import numpy as np
 
-# ✅ same as lab: model architecture (PoseNet)
+# same as lab: model architecture (PoseNet)
 class PoseNet(nn.Module):
     def __init__(self, num_keypoints):
         super().__init__()
@@ -19,11 +19,11 @@ class PoseNet(nn.Module):
         x = F.relu(self.conv2(x))
         return self.conv3(x)
 
-# ✅ same as lab: normalize images
+# same as lab: normalize images
 def normalize_image(img):
     return img.float() / 255
 
-# ⚠️ deviation: added resizing transform to enforce fixed input size
+# deviation: added resizing transform to enforce fixed input size
 class ResizePair:
     def __init__(self, size=(256, 256)):
         self.size = size
@@ -36,7 +36,7 @@ class ResizePair:
         tgt = TF.resize(tgt, self.size, interpolation=TF.InterpolationMode.BILINEAR)
         return {'image': img.float(), 'target': tgt.float()}
 
-# ⚠️ deviation: paired frame dataset to support temporal consistency
+# deviation: paired frame dataset to support temporal consistency
 class PairedFrameDataset(Dataset):
     def __init__(self, images, targets, transform=None):
         self.images = [normalize_image(img) for img in images]
@@ -54,14 +54,14 @@ class PairedFrameDataset(Dataset):
             sample_tp1 = self.transform(sample_tp1)
         return sample_t['image'], sample_t['target'], sample_tp1['image'], sample_tp1['target']
 
-# ✅ same as lab: binary cross entropy + adam optimizer
-# ⚠️ deviation: temporal consistency loss via dropout
+# same as lab: binary cross entropy + adam optimizer
+# deviation: temporal consistency loss via dropout
 def generate_dropout_mask(shape, drop_prob=0.3):
     K, H, W = shape
     keep = torch.rand(K) > drop_prob
     return keep[:, None, None].expand(K, H, W).float()
 
-# 🧠 main training function
+# main training function
 def train_dropout_temporal_consistency(data_path="lab3_data.pt", epochs=5, drop_prob=0.3):
     data = torch.load(data_path)
     train_images = data["train_images"]
@@ -72,7 +72,7 @@ def train_dropout_temporal_consistency(data_path="lab3_data.pt", epochs=5, drop_
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     transform = Compose([
-        ResizePair((256, 256))  # ⚠️ deviation: added resizing to align inputs
+        ResizePair((256, 256))  # added resizing to align inputs
     ])
 
     train_ds = PairedFrameDataset(train_images, train_targets, transform=transform)
@@ -86,7 +86,7 @@ def train_dropout_temporal_consistency(data_path="lab3_data.pt", epochs=5, drop_
     for epoch in range(epochs):
         model.train()
         total_loss = 0.0
-        print(f"\n🚀 starting epoch {epoch+1}...")
+        print(f"\n starting epoch {epoch+1}...")
 
         for img_t, tgt_t, img_tp1, tgt_tp1 in train_dl:
             img_t, img_tp1 = img_t.to(device), img_tp1.to(device)
@@ -95,7 +95,7 @@ def train_dropout_temporal_consistency(data_path="lab3_data.pt", epochs=5, drop_
             pred_t = model(img_t)
             pred_tp1 = model(img_tp1)
 
-            # ⚠️ deviation: dropout + temporal consistency
+            # deviation: dropout + temporal consistency
             dropout_mask = generate_dropout_mask(tgt_tp1.shape[1:], drop_prob).to(device)
             masked_tgt_tp1 = tgt_tp1 * dropout_mask
 
@@ -117,7 +117,7 @@ def train_dropout_temporal_consistency(data_path="lab3_data.pt", epochs=5, drop_
         print(f"📉 epoch {epoch+1} complete. total loss = {total_loss:.4f}")
 
     torch.save(model.state_dict(), "pose_model_dropout.pt")
-    print("✅ model saved to pose_model_dropout.pt")
+    print(" model saved to pose_model_dropout.pt")
 
 
 if __name__ == "__main__":
