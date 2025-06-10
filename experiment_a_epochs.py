@@ -14,9 +14,7 @@ from pose_dataset import PoseDataset
 from data_utils import load_annotations
 from split_utils_new import split_by_video
 
-# ----------------------------
-# UTILS
-# ----------------------------
+# utils
 def softargmax_2d(logits, orig_w=1024, orig_h=570):
     B, K, H, W = logits.shape
     probs = torch.softmax(logits.view(B, K, -1), dim=-1).view(B, K, H, W)
@@ -35,7 +33,7 @@ def softargmax_2d(logits, orig_w=1024, orig_h=570):
 def kl_heatmap_loss(logits, targets):
     B, K, H, W = logits.shape
     logits = logits.view(B, K, -1)
-    targets = targets.view(B, K, -1)  # ✅ This line was missing or incorrect
+    targets = targets.view(B, K, -1)  
     log_probs = F.log_softmax(logits, dim=-1)
     return F.kl_div(log_probs, targets, reduction='batchmean')
 
@@ -96,6 +94,7 @@ def visualize_predictions(model, dataset, annotation_data, save_dir, num_samples
             plt.tight_layout()
             plt.savefig(os.path.join(save_dir, f"viz_{i:02d}.png"))
             plt.close()
+            
 def save_heatmap_visualizations(model, dataset, save_dir, num_samples=5):
     model.eval()
     os.makedirs(save_dir, exist_ok=True)
@@ -166,7 +165,7 @@ import matplotlib.pyplot as plt
 import cv2
 import os
 
-# Define visualization function
+# visualization function
 def overlay_gt_pred_on_frames(dataset, annotation_data, model, save_dir, num_frames=5):
     os.makedirs(save_dir, exist_ok=True)
     model.eval()
@@ -195,9 +194,8 @@ def overlay_gt_pred_on_frames(dataset, annotation_data, model, save_dir, num_fra
             plt.tight_layout()
             plt.savefig(os.path.join(save_dir, f"frame_overlay_{i:02d}.png"))
             plt.close()
-# ----------------------------
-# CONFIG
-# ----------------------------
+            
+# configs
 TRAIN_ANNOTATION_PATH = "/home/ubuntu/stats-320-file/calms21_task1_train.npy"
 TEST_ANNOTATION_PATH = "/home/ubuntu/stats-320-file/calms21_task1_test.npy"
 VIDEO_DIR = "/home/ubuntu/stats-320-file/task1_videos_mp4/train"
@@ -214,12 +212,12 @@ LEARNING_RATE = 1e-4
 SIGMA_START = 3.00
 SIGMA_END = 1.5
 
-# ---------------------------- DATA ----------------------------
-print("🔄 Loading annotations...")
+# data
+print("lading data annotations")
 train_annots = load_annotations(TRAIN_ANNOTATION_PATH)
 test_annots_full = load_annotations(TEST_ANNOTATION_PATH)
 
-# Set fixed seed for reproducible data split
+# set fixed seed for reproducible data split
 SEED = 73
 rng = random.Random(SEED)
 
